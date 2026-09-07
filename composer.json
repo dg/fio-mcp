@@ -1,5 +1,7 @@
 {
 	"name": "dg/fio-mcp",
+	"description": "MCP server for the Fio banka API: read account movements and queue payments for authorization.",
+	"keywords": ["fio", "bank", "banking", "payments", "mcp"],
 	"authors": [
 		{
 			"name": "David Grudl",
@@ -8,8 +10,13 @@
 	],
 	"license": "MIT",
 	"require": {
-		"php": ">=8.1",
-		"mcp/sdk": "^0.8"
+		"php": ">=8.2",
+		"ext-curl": "*",
+		"ext-mbstring": "*",
+		"ext-simplexml": "*",
+		"ext-xmlwriter": "*",
+		"mcp/sdk": "^0.8",
+		"symfony/finder": "^7.0 || ^8.0"
 	},
 	"require-dev": {
 		"nette/tester": "^2.5",
@@ -20,9 +27,14 @@
 	"autoload": {
 		"classmap": ["src/"]
 	},
+	"scripts": {
+		"phpstan": "phpstan analyse",
+		"tester": "tester tests -s"
+	},
 	"config": {
 		"allow-plugins": {
-			"phpstan/extension-installer": true
+			"phpstan/extension-installer": true,
+			"php-http/discovery": true
 		}
 	}
 }
