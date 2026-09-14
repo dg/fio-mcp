@@ -3,3 +3,11 @@ parameters:
 
 	paths:
 		- src
+		- server.php
+
+	ignoreErrors:
+		# McpToolCallGuard catches exceptions the decorated SDK handler really throws at runtime, but
+		# its interface under-declares @throws, so PHPStan flags the catches as dead.
+		-
+			identifier: catch.neverThrown
+			path: src/McpToolCallGuard.php
