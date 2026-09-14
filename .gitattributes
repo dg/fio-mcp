@@ -1,5 +1,6 @@
 .gitattributes  export-ignore
 .github/        export-ignore
+AGENTS.md       export-ignore
 .gitignore      export-ignore
 dresscode.neon  export-ignore
 phpstan*.neon   export-ignore
@@ -7,5 +8,3 @@ tests/          export-ignore
 
 *               text=auto
 *.php*          diff=php
-*.sh            text eol=lf
-mcp-inspector   text eol=lf
