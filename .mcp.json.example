@@ -1,0 +1,12 @@
+{
+	"mcpServers": {
+		"fio": {
+			"command": "php",
+			"args": ["/cesta/k/fio-mcp/server.php"],
+			"env": {
+				"FIO_TOKEN": "vas-64-znakovy-token",
+				"FIO_ALLOW_PAYMENTS": "0"
+			}
+		}
+	}
+}
