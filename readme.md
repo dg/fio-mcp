@@ -47,22 +47,51 @@ Konfigurace
 | `FIO_TOKEN`          | API token k účtu (povinné) |
 | `FIO_ALLOW_PAYMENTS` | `1` povolí odesílání plateb; bez něj server platby odmítá |
 
-Konfigurace pro Claude Code (`.mcp.json`):
+Hotová konfigurace je v souboru [.mcp.json.example](.mcp.json.example). Zkopírujte ho, doplňte
+absolutní cestu k `server.php` a token, a pokud chcete odesílat platby, přepište
+`FIO_ALLOW_PAYMENTS` na `"1"`. Kam soubor patří, záleží na nástroji:
+
+| Nástroj        | Umístění |
+|----------------|----------|
+| Claude Code    | `.mcp.json` v kořeni projektu |
+| Claude Desktop | obsah vložte do `claude_desktop_config.json` (Windows: `%APPDATA%\Claude\`, macOS: `~/Library/Application Support/Claude/`) |
+| Cursor         | `.cursor/mcp.json` v projektu, nebo `~/.cursor/mcp.json` pro všechny projekty |
+| Gemini CLI     | `.gemini/settings.json` v projektu, nebo `~/.gemini/settings.json` |
+| Windsurf       | `~/.codeium/windsurf/mcp_config.json` |
+
+VS Code (Copilot) používá klíč `servers` a umí si token vyžádat při spuštění, takže nemusí
+ležet v souboru. Do `.vscode/mcp.json`:
 
 ```json
 {
-	"mcpServers": {
+	"inputs": [
+		{"type": "promptString", "id": "fio-token", "description": "Fio API token", "password": true}
+	],
+	"servers": {
 		"fio": {
+			"type": "stdio",
 			"command": "php",
 			"args": ["/cesta/k/fio-mcp/server.php"],
 			"env": {
-				"FIO_TOKEN": "...",
-				"FIO_ALLOW_PAYMENTS": "1"
+				"FIO_TOKEN": "${input:fio-token}",
+				"FIO_ALLOW_PAYMENTS": "0"
 			}
 		}
 	}
 }
 ```
+
+OpenAI Codex CLI má konfiguraci v TOML, do `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.fio]
+command = "php"
+args = ["/cesta/k/fio-mcp/server.php"]
+env = { FIO_TOKEN = "vas-64-znakovy-token", FIO_ALLOW_PAYMENTS = "0" }
+```
+
+**Soubor s tokenem nikdy necommitujte.** Pokud konfiguraci ukládáte do projektu, přidejte ji
+do `.gitignore`.
 
 Více účtů = více instancí serveru, každá se svým tokenem a jménem (`fio-firma`, `fio-osobni`).
 
