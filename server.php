@@ -15,6 +15,7 @@ use Mcp\Capability\Registry\ReferenceHandler;
 use Mcp\Exception\ToolCallException;
 use Mcp\Schema\ServerCapabilities;
 use Mcp\Server;
+use Mcp\Server\Session\InMemorySessionStore;
 use Mcp\Server\Transport\StdioTransport;
 
 $token = trim((string) getenv('FIO_TOKEN'));
@@ -65,6 +66,8 @@ $instructions = <<<TEXT
 // the message instead of an opaque JSON-RPC error.
 $server = Server::builder()
 	->setServerInfo('fio', '1.0.0', 'MCP server for the Fio banka API')
+	// a stdio session lasts as long as the process, the idle run loop would expire it after an hour
+	->setSession(new InMemorySessionStore(ttl: PHP_INT_MAX))
 	->setInstructions($instructions)
 	// discovery would otherwise advertise prompts, resources and completions the server does not have
 	->setCapabilities(new ServerCapabilities(tools: true, resources: false, prompts: false, logging: false, completions: false))
@@ -73,4 +76,14 @@ $server = Server::builder()
 	->setDiscovery(__DIR__ . '/src', ['.'], namePatterns: ['*Tools.php'])
 	->build();
 
-$server->run(new StdioTransport);
+// fgets() on a pipe silent for about 13.5 hours reports a false EOF on Windows, which would end the server
+$server->run(new class extends StdioTransport {
+	protected function processInput(): void
+	{
+		$read = [STDIN];
+		$write = $except = null;
+		if (stream_select($read, $write, $except, 0, 50000) > 0) {
+			parent::processInput();
+		}
+	}
+});
